@@ -32,11 +32,12 @@ let equal = document.querySelector(".equal")
 
 let amal = false;
 let dotBool = false;
-let result;
-let tempValue;
 let operator = false;
 let keyBool = false;
 let tenglik = false;
+let lastOperator = null;
+let result;
+let tempValue;
 
 
 function labelAdd(number){
@@ -48,121 +49,118 @@ function labelAdd(number){
         arxivInput.value = null;
         tenglik = false;
     } else {
-        if (number != 0){
+        if (number !== 0){
             displayInput.value = number;
             keyBool = true;
         }
     }
-    
 }
 
-let lastOperator = null;
+function lastOpFunc(lastOperator){
+    switch (lastOperator){
+        case "add": {
+            natija =(tempValue - 0) + (displayInput.value - 0);
+            break;
+        }
+        case "min": {
+            natija =(tempValue - 0) - (displayInput.value - 0);
+            break;
+        }
+        case "div": {
+            natija =(tempValue - 0) / (displayInput.value - 0);
+            break;
+        }
+        case "mult": {
+            natija =(tempValue - 0) * (displayInput.value - 0);
+            break;
+        }
+    }
+
+    return natija;
+}
+
 function calc(name, a){
+    dotBool = false;
     
     if (operator == true && keyBool){
-        operator = false;
-        amal = true;  
+        amal = true;
+        keyBool = false;
         let natija;
         
         switch(name){
-            case "add": 
-                natija =(tempValue - 0) + (displayInput.value - 0);
+            case "add":
+                natija = lastOpFunc(lastOperator);
                 arxivInput.value = natija;
                 displayInput.value = natija;
-                a = arxivInput.value;
+                tempValue = arxivInput.value;
+                
+                arxivInput.value += " + ";
+                lastOperator = "add";
                 break;
-
+                
             case "min": 
-                natija =(tempValue - 0) - (displayInput.value - 0);
-                console.log(natija)
+                natija = lastOpFunc(lastOperator);
                 arxivInput.value = natija;
                 displayInput.value = natija;
-                a = arxivInput.value;
+                tempValue = arxivInput.value;
                 
                 arxivInput.value += " - ";
+                lastOperator = "min";
                 break;
-
+                
             case "div": 
-            natija =(tempValue - 0) / (displayInput.value - 0);
+                natija = lastOpFunc(lastOperator);
                 arxivInput.value = natija;
                 displayInput.value = natija;
-                a = arxivInput.value;
+                tempValue = arxivInput.value;
                 
                 arxivInput.value += " / ";
+                lastOperator = "div";
                 break;
-
-            case "mult": 
-            natija =(tempValue - 0) * (displayInput.value - 0);
+                
+                case "mult": 
+                natija = lastOpFunc(lastOperator);
                 arxivInput.value = natija;
                 displayInput.value = natija;
-                a = arxivInput.value;  
+                tempValue = arxivInput.value;  
+                
                 arxivInput.value += " * ";
+                lastOperator = "mult";
                 break;
 
             case "teng":
+                operator = false;
                 arxivInput.value += displayInput.value + " = ";
-                switch (lastOperator){
-                    case "add": {
-                        natija =(tempValue - 0) + (displayInput.value - 0);
-                        break;
-                    }
-                    case "min": {
-                        natija =(tempValue - 0) - (displayInput.value - 0);
-                        break;
-                    }
-                    case "div": {
-                        natija =(tempValue - 0) / (displayInput.value - 0);
-                        break;
-                    }
-                    case "mult": {
-                        natija =(tempValue - 0) * (displayInput.value - 0);
-                        break;
-                    }
-                }
+                natija = lastOpFunc(lastOperator);
                 displayInput.value = natija;
+                lastOperator = null;
         }
-
-        lastOperator = null;
-    }
-
-
-    if (name === "add" && lastOperator !== "add" ){
+    } else {
         operator = true;
         keyBool = false;
         tenglik = false;
-        arxivInput.value = a + ' + ';
-        tempValue = a;
-        lastOperator = "add";
-    }
-
-    if (name === "min" && lastOperator !== "min" ){
-        operator = true;
-        keyBool = false;
-        tenglik = false;
-        arxivInput.value = a + ' - ';
-        tempValue = a;
-        lastOperator = "min";
-        console.log("min");
-       console.log(arxivInput.value);
-       console.log(a)
-    }
-
-    if (name === "div" && lastOperator !== "div" ){
-        operator = true;
-        keyBool = false;
-        tenglik = false;
-        arxivInput.value = a + ' / ';
-        tempValue = a;
-        lastOperator = "div";
-    }
-
-    if (name === "mult" && lastOperator !== "mult" ){
-        operator = true;
-        keyBool = false;
-        tenglik = false;
-        arxivInput.value = a + ' * ';
-        tempValue = a;
-        lastOperator = "mult";
+        if (name === "add" && lastOperator !== "add" ){
+            arxivInput.value = a + ' + ';
+            tempValue = a;
+            lastOperator = "add";
+        }
+        if (name === "min" && lastOperator !== "min" ){
+            arxivInput.value = a + ' - ';
+            tempValue = a;
+            lastOperator = "min";
+        }
+    
+        if (name === "div" && lastOperator !== "div" ){
+            arxivInput.value = a + ' / ';
+            tempValue = a;
+            lastOperator = "div";
+        }
+    
+        if (name === "mult" && lastOperator !== "mult" ){
+            arxivInput.value = a + ' * ';
+            tempValue = a;
+            lastOperator = "mult";
+        }
     }
 }
 
@@ -187,6 +185,7 @@ equal.addEventListener("click", function(){
     calc("teng", displayInput.value);
     tenglik = true;
     keyBool = false;
+    dotBool = false;
 })
 
 one.addEventListener('click', function(){
@@ -228,25 +227,27 @@ zero.addEventListener('click', function(){
 })
 
 CE.addEventListener('click', function(){
-    displayInput.value = 0; 
+    displayInput.value = 0;
+    keyBool = true;
+    dotBool = false;
+
     if (tenglik){
         arxivInput.value = null;
         tempValue = 0
-        amal = false;
+        amal = true;
         operator = false;
-        displayInput.value = 0; 
         lastOperator = null;
-        dotBool = false;
     }   
 })
 
 C.addEventListener('click', function(){
     arxivInput.value = null;
     tempValue = 0
-    amal = false;
+    amal = true;
     operator = false;
-    displayInput.value = 0; 
+    displayInput.value = 0;
     lastOperator = null;
+    keyBool = true;
     dotBool = false;
 })
 
@@ -289,6 +290,8 @@ change.addEventListener("click", function(){
 })
 
 dot.addEventListener("click", function(){
+    amal = true;
+
     if (tenglik){
         displayInput.value = 0;
         arxivInput.value = null;
@@ -297,7 +300,7 @@ dot.addEventListener("click", function(){
     }
 
     if (!dotBool){
-        result = (displayInput.value) + '.';
+        result = displayInput.value + '.';
         dotBool = true;
     }
     else {
